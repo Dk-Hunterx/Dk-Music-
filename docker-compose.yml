@@ -1,0 +1,6 @@
+services:
+  dkmusic:
+    build: .
+    container_name: dk-music
+    restart: unless-stopped
+    env_file: .env
