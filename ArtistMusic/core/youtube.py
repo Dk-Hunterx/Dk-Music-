@@ -160,13 +160,30 @@ class YouTube:
         return None
 
     def get_cookies(self):
-        """Get random cookie file from cookies directory."""
+        """Get a private Netscape cookie file or a downloaded cookie file."""
         if not self.checked:
-            cookies_dir = "ArtistMusic/cookies"
-            if os.path.exists(cookies_dir):
-                for file in os.listdir(cookies_dir):
-                    if file.endswith(".txt"):
-                        self.cookies.append(file)
+            cookies_dir = Path("ArtistMusic/cookies")
+            cookies_dir.mkdir(parents=True, exist_ok=True)
+
+            # Railway secret: complete Netscape-format cookies.txt.
+            # Never log or print cookie contents.
+            cookie_text = getattr(config, "YOUTUBE_COOKIES", "")
+            if cookie_text and cookie_text.strip():
+                private_cookie = cookies_dir / "private_cookies.txt"
+                try:
+                    private_cookie.write_text(cookie_text.strip() + "\n", encoding="utf-8")
+                    try:
+                        os.chmod(private_cookie, 0o600)
+                    except OSError:
+                        pass
+                    self.cookies.append(private_cookie.name)
+                    logger.info("🍪 Loaded private YouTube cookies from environment.")
+                except OSError as e:
+                    logger.error(f"Could not write private YouTube cookies: {e}")
+
+            for file in os.listdir(cookies_dir):
+                if file.endswith(".txt") and file not in self.cookies:
+                    self.cookies.append(file)
             self.checked = True
         
         if not self.cookies:
