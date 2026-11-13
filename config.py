@@ -47,6 +47,8 @@ class Config:
         self.API_TIMEOUT: int = _int_env("API_TIMEOUT", 60)
         self.API_STREAM_TIMEOUT: int = _int_env("API_STREAM_TIMEOUT", 300)
         self.COOKIES_URL: List[str] = self._parse_cookies()
+        # Private Netscape-format YouTube cookies supplied as a Railway secret.
+        self.YOUTUBE_COOKIES: str = getenv("YOUTUBE_COOKIES", "")
 
         self.DEFAULT_THUMB: str = getenv("DEFAULT_THUMB", "https://graph.org/file/e9b9081be519f0e1413dd-a0fd9c7fc36c010a1c.mp4")
         self.PING_IMG: str = getenv("PING_IMG", self.DEFAULT_THUMB)
