@@ -111,7 +111,11 @@ async def main():
         http_thread.start()
         logger.info("🌐 HTTP server thread started for Render health checks")
 
-        # Step 3: Connect to MongoDB database
+        # Step 3: Load configured YouTube cookies before the first download.
+        if config.COOKIES_URL:
+            await yt.save_cookies(config.COOKIES_URL)
+
+        # Step 4: Connect to MongoDB database
         await db.connect()
         
         # Step 4: Start the main bot client
