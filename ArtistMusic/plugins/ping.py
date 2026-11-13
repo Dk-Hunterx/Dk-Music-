@@ -21,7 +21,7 @@ from ArtistMusic import app, tune, boot, config, lang
 from ArtistMusic.helpers import buttons, utils
 
 
-@app.on_message(filters.command(["alive", "ping"]) & ~app.bl_users)
+@app.on_message(filters.command(["ping"]) & ~app.bl_users)
 @lang.language()
 async def _ping(_, m: types.Message):
     # Auto-delete command message
