@@ -63,7 +63,14 @@ Termux may require the platform-specific FFmpeg and PyTgCalls setup.
 
 ## YouTube extraction
 
-Direct yt-dlp extraction is enabled by default. YouTube may change its anti-bot and extraction behavior, so playback is not guaranteed for every video or region. If needed, configure `COOKIE_URL` with a private cookie-host URL. Do not publish or share account cookies. An optional external extractor API can be enabled by setting `ENABLE_API=True` and supplying its endpoint and key.
+Direct yt-dlp extraction is enabled by default. YouTube may challenge datacenter IPs, so use your own Netscape-format cookies when required:
+
+1. Export your own YouTube cookies in Netscape `cookies.txt` format using a trusted browser export method.
+2. In Railway, open **Variables** and add `YOUTUBE_COOKIES`.
+3. Paste the complete contents of `cookies.txt` as the variable value, including its header and cookie rows. Keep it private.
+4. Redeploy. The bot writes the secret to a private cookie file and uses it for yt-dlp.
+
+Do not send cookies in Telegram, chat, screenshots, public paste sites, or GitHub. Cookies can expire and may need to be exported again. YouTube can still block extraction even with cookies; use only an account you control and follow YouTube's terms. The optional `COOKIE_URL` legacy method and external API integration remain available.
 
 ## Credits and license
 
