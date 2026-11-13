@@ -491,8 +491,12 @@ class YouTube:
                 "fragment_retries": 2,
                 "extractor_retries": 5,
                 "sleep_interval_requests": 1,
-                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+                # Let current yt-dlp choose its supported default YouTube clients.
+                # Hard-coding android/web can trigger PO-token / 403 failures.
             }
+
+            if cookie and os.path.isfile(cookie):
+                base_opts["cookiefile"] = cookie
 
             if video:
                 height_filter = ""
@@ -521,10 +525,10 @@ class YouTube:
                     "postprocessors": [],
                 }
 
-            ydl_opts_cookie = {
-                **ydl_opts,
-                "cookiefile": cookie,
-            }
+            # Run without cookies by default; attach them only when a real file exists.
+            ydl_opts_runtime = dict(ydl_opts)
+            if cookie and os.path.isfile(cookie):
+                ydl_opts_runtime["cookiefile"] = cookie
 
             def _download(ydl_runtime_opts):
                 ydl_instance = None
@@ -557,8 +561,11 @@ class YouTube:
                         except Exception:
                             pass
 
-            logger.info(f"🍪 [COOKIES FALLBACK] Downloading {video_id} with cookies...")
-            result = await asyncio.to_thread(_download, ydl_opts_cookie)
+            logger.info(
+                f"⬇️ [YT-DLP] Downloading {video_id} "
+                f"({'cookies' if cookie and os.path.isfile(cookie) else 'without cookies'})..."
+            )
+            result = await asyncio.to_thread(_download, ydl_opts_runtime)
             
             if result:
                 logger.info(f"✅ [COOKIES SUCCESS] Downloaded: {result}")
@@ -906,15 +913,17 @@ class YouTube:
             cookie = self.get_cookies()
             ydl_opts = {
                 "quiet": True,
-                "no_warnings": True,
-                "cookiefile": cookie,
+                "no_warnings": False,
                 "format": "bestaudio/best",
                 "noplaylist": True,
-                "socket_timeout": 20,
+                "socket_timeout": 30,
+                "retries": 3,
                 "extractor_retries": 5,
                 "sleep_interval_requests": 1,
-                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
             }
+            # Cookies are optional. Do not pass cookiefile=None to yt-dlp.
+            if cookie and os.path.isfile(cookie):
+                ydl_opts["cookiefile"] = cookie
 
             def _extract_url():
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
