@@ -66,7 +66,7 @@ class Config:
 
     def _parse_cookies(self) -> List[str]:
         values = getenv("COOKIE_URL", "")
-        allowed = ("batbin.me", "pastebin.com", "paste.ee", "rentry.co")
+        allowed = ("batbin.me", "pastebin.com", "paste.ee", "rentry.co", "raw.githubusercontent.com")
         return [u.strip() for u in values.split() if u.strip() and any(host in u for host in allowed)]
 
     @staticmethod
